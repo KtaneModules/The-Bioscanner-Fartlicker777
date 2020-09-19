@@ -10,17 +10,23 @@ public class TheBioscanner : MonoBehaviour {
 
     public KMBombInfo Bomb;
     public KMAudio Audio;
-    public Renderer Space;
+
     public KMSelectable[] Buttons;
-    public GameObject MovingAll;
-    public Renderer[] ButtonOutlinesButColors;
-    public Material ColorForSwitching;
-    public TextMesh NumbersOfShifting;
-    public Sprite[] TheGlyphsButSprites;
-    public GameObject[] Glyphs;
     public KMSelectable StartButton;
+
+    public GameObject[] Glyphs;
     public GameObject StartButtonObject;
+    public GameObject MovingAll;
+
+    public Material ColorForSwitching;
+
+    public Renderer[] ButtonOutlinesButColors;
+    public Renderer Space;
+
+    public TextMesh NumbersOfShifting;
     public TextMesh ProtocolText;
+
+    public Sprite[] TheGlyphsButSprites;
 
     static int moduleIdCounter = 1;
     int moduleId;
@@ -37,10 +43,6 @@ public class TheBioscanner : MonoBehaviour {
     float XOffset = 0f;
     float YOffset = 0f;
     float TheTimerForThis = 30f;
-
-    bool[] Pressed = new bool[10];
-    bool Started = false;
-    bool Checking = false;
 
     string[][] NatoIGuess = new string[17][] {
       new string[1] {"Alpha "},
@@ -65,6 +67,13 @@ public class TheBioscanner : MonoBehaviour {
     string Protocol = "Initiating security Protocol:\n";
     string SN = "";
     string Alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+
+    bool[] Pressed = new bool[10];
+    bool Started = false;
+    bool Checking = false;
+    #pragma warning disable 0649
+    bool TwitchPlaysActive;
+    #pragma warning restore 0649
 
     Vector3 FUCKINGMOVE = new Vector3(0f, 1f, 0f);
 
@@ -122,28 +131,18 @@ public class TheBioscanner : MonoBehaviour {
       SecondBreakFromLoop:
       EdgeworkBullshit = ((Bomb.GetSerialNumberNumbers().ToArray().Last()) * (Bomb.GetIndicators().Count())) % 11;
       GlyphNumbers[1] += EdgeworkBullshit * 5;
-      if (Bomb.GetPortCount() == 0) {
-        goto NoPorts;
-      }
-      if (Bomb.IsPortPresent(Port.StereoRCA)) {
+      if (Bomb.IsPortPresent(Port.StereoRCA))
         GlyphNumbers[2] += Bomb.GetPortCount(Port.StereoRCA);
-      }
-      else if (Bomb.IsPortPresent(Port.Serial)) {
+      else if (Bomb.IsPortPresent(Port.Serial))
         GlyphNumbers[2] += Bomb.GetPortCount(Port.Serial);
-      }
-      else if (Bomb.IsPortPresent(Port.RJ45)) {
+      else if (Bomb.IsPortPresent(Port.RJ45))
         GlyphNumbers[2] += Bomb.GetPortCount(Port.RJ45);
-      }
-      else if (Bomb.IsPortPresent(Port.PS2)) {
+      else if (Bomb.IsPortPresent(Port.PS2))
         GlyphNumbers[2] += Bomb.GetPortCount(Port.PS2);
-      }
-      else if (Bomb.IsPortPresent(Port.Parallel)) {
+      else if (Bomb.IsPortPresent(Port.Parallel))
         GlyphNumbers[2] += Bomb.GetPortCount(Port.Parallel);
-      }
-      else if (Bomb.IsPortPresent(Port.DVI)) {
+      else if (Bomb.IsPortPresent(Port.DVI))
         GlyphNumbers[2] += Bomb.GetPortCount(Port.DVI);
-      }
-      NoPorts:
       EdgeworkBullshit = Bomb.GetBatteryCount() % 11;
       GlyphNumbers[2] += EdgeworkBullshit * 5;
       Restart:
@@ -163,10 +162,16 @@ public class TheBioscanner : MonoBehaviour {
       if (RandomXOffset == RandomYOffset)
         RandomXOffset += .1f;
       StartCoroutine(MovingSpace());
-      LogEverything();
+      Debug.LogFormat("[The Bioscanner #{0}] The first coordinate is {1}{2}.", moduleId, Alphabet[GlyphNumbers[0] % 5], (GlyphNumbers[0] / 5) + 1);
+      Debug.LogFormat("[The Bioscanner #{0}] The second coordinate is {1}{2}.", moduleId, Alphabet[GlyphNumbers[1] % 5], (GlyphNumbers[1] / 5) + 1);
+      Debug.LogFormat("[The Bioscanner #{0}] The third coordinate is {1}{2}.", moduleId, Alphabet[GlyphNumbers[2] % 5], (GlyphNumbers[2] / 5) + 1);
     }
 
     void StartPress () {
+      if (TwitchPlaysActive)
+        TheTimerForThis = 45f;
+      else
+        TheTimerForThis = 30f;
       Started = true;
       StartButtonObject.gameObject.SetActive(false);
       StartButton.transform.localPosition -= FUCKINGMOVE;
@@ -180,9 +185,16 @@ public class TheBioscanner : MonoBehaviour {
         if (TheTimerForThis < 0) {
           StartButtonObject.gameObject.SetActive(true);
           MovingAll.gameObject.SetActive(false);
-          TheTimerForThis = 30f;
+          if (TwitchPlaysActive)
+            TheTimerForThis = 45f;
+          else
+            TheTimerForThis = 30f;
           StartButton.transform.localPosition += FUCKINGMOVE;
           GetComponent<KMBombModule>().HandleStrike();
+          for (int shitknocker = 0; shitknocker < 10; shitknocker++) {
+            Pressed[shitknocker] = false;
+            ButtonOutlinesButColors[shitknocker].material.color = new Color32(255, 0, 0, 255);
+          }
           Started = false;
         }
       }
@@ -192,21 +204,32 @@ public class TheBioscanner : MonoBehaviour {
       if (Checking) {
         return;
       }
-      for (int i = 0; i < Buttons.Length; i++) {
-        if (Button == Buttons[i]) {
-          Audio.PlaySoundAtTransform("FuckYouNumbers", Buttons[i].transform);
-          StartCoroutine(ColorChanger(i, Pressed[i]));
-          Pressed[i] = !Pressed[i];
-          int NumberOfPressed = 0;
-          for (int j = 0; j < 10; j++) {
-            if (Pressed[j]) {
-              NumberOfPressed++;
+      if (moduleSolved) {
+        for (int i = 0; i < Buttons.Length; i++) {
+          if (Button == Buttons[i]) {
+            Audio.PlaySoundAtTransform("FuckYouNumbers", Buttons[i].transform);
+            StartCoroutine(ColorChanger(i, Pressed[i]));
+            Pressed[i] = !Pressed[i];
+            }
+        }
+      }
+      else {
+        for (int i = 0; i < Buttons.Length; i++) {
+          if (Button == Buttons[i]) {
+            Audio.PlaySoundAtTransform("FuckYouNumbers", Buttons[i].transform);
+            StartCoroutine(ColorChanger(i, Pressed[i]));
+            Pressed[i] = !Pressed[i];
+            int NumberOfPressed = 0;
+            for (int j = 0; j < 10; j++) {
+              if (Pressed[j]) {
+                NumberOfPressed++;
+              }
+            }
+            if (NumberOfPressed == 3)
+              StartCoroutine(Waiting());
             }
           }
-          if (NumberOfPressed == 3)
-            StartCoroutine(Waiting());
-          }
-        }
+      }
       }
 
     IEnumerator Waiting () {
@@ -273,7 +296,7 @@ public class TheBioscanner : MonoBehaviour {
       GlyphOffset = UnityEngine.Random.Range(0,6);
       NumbersOfShifting.text = GlyphOffset.ToString();
       for (int i = 0; i < 52; i++) {
-        if (i + GlyphOffset != GlyphNumbers[0] && i + GlyphOffset != GlyphNumbers[1] && i + GlyphOffset != GlyphNumbers[2]) {
+        if ((i + GlyphOffset) % 55 != GlyphNumbers[0] + GlyphOffset % 55 && (i + GlyphOffset) % 55 != GlyphNumbers[1] + GlyphOffset % 55 && (i + GlyphOffset) % 55 != GlyphNumbers[2] + GlyphOffset % 55) {
           GlyphNumbersRandomized[i] = (i + GlyphOffset) % 55;
         }
       }
@@ -283,15 +306,47 @@ public class TheBioscanner : MonoBehaviour {
       Glyphs[GlyphRandomized[1]].GetComponent<SpriteRenderer>().sprite = TheGlyphsButSprites[(GlyphNumbers[1] + GlyphOffset) % 55];
       Glyphs[GlyphRandomized[2]].GetComponent<SpriteRenderer>().sprite = TheGlyphsButSprites[(GlyphNumbers[2] + GlyphOffset) % 55];
       for (int i = 3; i < 10; i++) {
-        Glyphs[GlyphRandomized[i]].GetComponent<SpriteRenderer>().sprite = TheGlyphsButSprites[(GlyphNumbersRandomized[i] + GlyphOffset) % 55];
+        Glyphs[GlyphRandomized[i]].GetComponent<SpriteRenderer>().sprite = TheGlyphsButSprites[GlyphNumbersRandomized[i]];
       }
-      Debug.LogFormat("[The Bioscanner #{0}] The current offset is {1}.", moduleId, GlyphOffset);
-    }
-
-    void LogEverything () {
-      Debug.LogFormat("[The Bioscanner #{0}] The first coordinate is {1}{2}.", moduleId, Alphabet[GlyphNumbers[0] % 5], (GlyphNumbers[0] / 5) + 1);
-      Debug.LogFormat("[The Bioscanner #{0}] The second coordinate is {1}{2}.", moduleId, Alphabet[GlyphNumbers[1] % 5], (GlyphNumbers[1] / 5) + 1);
-      Debug.LogFormat("[The Bioscanner #{0}] The third coordinate is {1}{2}.", moduleId, Alphabet[GlyphNumbers[2] % 5], (GlyphNumbers[2] / 5) + 1);
+      Debug.LogFormat("[The Bioscanner #{0}] The current offset is {1}. This means the current coordinates are {2}{3}, {4}{5}, and {6}{7}.", moduleId, GlyphOffset, Alphabet[(((GlyphNumbers[0] + GlyphOffset) % 55)) % 5], ((((GlyphNumbers[0] + GlyphOffset) % 55)) / 5) + 1, Alphabet[((GlyphNumbers[1] + GlyphOffset) % 55) % 5], (((GlyphNumbers[1] + GlyphOffset) % 55) / 5) + 1, Alphabet[((GlyphNumbers[2] + GlyphOffset) % 55) % 5], (((GlyphNumbers[2] + GlyphOffset) % 55) / 5) + 1);
+      Debug.LogFormat("[The Bioscanner #{0}] Fake glyphs are:", moduleId);
+      for (int i = 3; i < 10; i++)
+        Debug.LogFormat("[The Bioscanner #{0}] {1}{2}.", moduleId, Alphabet[GlyphNumbersRandomized[i] % 5], (GlyphNumbersRandomized[i] / 5) + 1);
+      Debug.LogFormat("[The Bioscanner #{0}] Press buttons:", moduleId);
+      for (int i = 0; i < 3; i++) {
+        switch (GlyphRandomized[i]) {
+          case 0:
+          Debug.LogFormat("[The Bioscanner #{0}] B1.", moduleId);
+          break;
+          case 1:
+          Debug.LogFormat("[The Bioscanner #{0}] B2.", moduleId);
+          break;
+          case 2:
+          Debug.LogFormat("[The Bioscanner #{0}] B3.", moduleId);
+          break;
+          case 3:
+          Debug.LogFormat("[The Bioscanner #{0}] B4.", moduleId);
+          break;
+          case 4:
+          Debug.LogFormat("[The Bioscanner #{0}] A1.", moduleId);
+          break;
+          case 5:
+          Debug.LogFormat("[The Bioscanner #{0}] A2.", moduleId);
+          break;
+          case 6:
+          Debug.LogFormat("[The Bioscanner #{0}] A3.", moduleId);
+          break;
+          case 7:
+          Debug.LogFormat("[The Bioscanner #{0}] C1.", moduleId);
+          break;
+          case 8:
+          Debug.LogFormat("[The Bioscanner #{0}] C2.", moduleId);
+          break;
+          case 9:
+          Debug.LogFormat("[The Bioscanner #{0}] C3.", moduleId);
+          break;
+        }
+      }
     }
 
     #pragma warning disable 414
@@ -337,6 +392,7 @@ public class TheBioscanner : MonoBehaviour {
       else {
         yield return null;
         yield return "sendtochaterror I don't understand!";
+        yield break;
       }
     }
 

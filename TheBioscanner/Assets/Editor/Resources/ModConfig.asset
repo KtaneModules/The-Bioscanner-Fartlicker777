@@ -17,6 +17,9 @@ MonoBehaviour:
   description: 'Initiating Security Protocol Angry Salamanders Sifting.
 
 
+    Based off of the Push the Button game from Jackbox Party Pack 5.
+
+
     Manual can be found at ktane.timwi.de'
   version: 
   outputFolder: build

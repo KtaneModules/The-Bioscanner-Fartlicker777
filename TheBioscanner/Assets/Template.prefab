@@ -976,8 +976,8 @@ Transform:
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1849910599807584}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 1.42, y: -4.9, z: 3}
-  m_LocalScale: {x: 175.13864, y: 0.84185225, z: 174.13388}
+  m_LocalPosition: {x: 2.43, y: -4.9, z: -23.5}
+  m_LocalScale: {x: 176.19818, y: 0.7074643, z: 135.5755}
   m_Children: []
   m_Father: {fileID: 4852019808729764}
   m_RootOrder: 0
@@ -2931,32 +2931,46 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   Bomb: {fileID: 114969066581751522}
   Audio: {fileID: 114802395972024470}
-  Space: {fileID: 23395952228666886}
   Buttons:
   - {fileID: 114682044694261674}
   - {fileID: 114221341756432378}
   - {fileID: 114549380298212032}
   - {fileID: 114208471257141740}
   - {fileID: 114916071083863370}
-  - {fileID: 114230957112463836}
   - {fileID: 114740016785688784}
+  - {fileID: 114230957112463836}
   - {fileID: 114773697281363982}
   - {fileID: 114136185903541564}
   - {fileID: 114280066684598294}
+  StartButton: {fileID: 114721747335811842}
+  Glyphs:
+  - {fileID: 1860922102210260}
+  - {fileID: 1966823521396104}
+  - {fileID: 1505598755065994}
+  - {fileID: 1305829100854526}
+  - {fileID: 1050282353660368}
+  - {fileID: 1177821156162592}
+  - {fileID: 1710143612990178}
+  - {fileID: 1946089313994384}
+  - {fileID: 1951914442358624}
+  - {fileID: 1651122543700684}
+  StartButtonObject: {fileID: 1668464805958858}
   MovingAll: {fileID: 1676409040304040}
+  ColorForSwitching: {fileID: 2100000, guid: 0b8345d6190d14013b825698a59f7759, type: 2}
   ButtonOutlinesButColors:
   - {fileID: 23436669186491008}
   - {fileID: 23378120405944060}
   - {fileID: 23916531551545280}
   - {fileID: 23870451019791370}
   - {fileID: 23943090725181826}
-  - {fileID: 23955509346215346}
   - {fileID: 23515092712014838}
+  - {fileID: 23955509346215346}
   - {fileID: 23747091678878214}
   - {fileID: 23627790335731218}
   - {fileID: 23557109429232874}
-  ColorForSwitching: {fileID: 2100000, guid: 0b8345d6190d14013b825698a59f7759, type: 2}
+  Space: {fileID: 23395952228666886}
   NumbersOfShifting: {fileID: 102104484440166514}
+  ProtocolText: {fileID: 102238220837740976}
   TheGlyphsButSprites:
   - {fileID: 21300000, guid: a42e0d87eaa13aa478648d862f0092c3, type: 3}
   - {fileID: 21300000, guid: 6dd5fc08d0133cd418ffa16a359e2632, type: 3}
@@ -3013,20 +3027,6 @@ MonoBehaviour:
   - {fileID: 21300000, guid: b6643571cfe10304b87a0e5b24cc5c26, type: 3}
   - {fileID: 21300000, guid: 68f278a212477f34b9bc0150e2357917, type: 3}
   - {fileID: 21300000, guid: 5390a89042777fc48b248cb1df2632d4, type: 3}
-  Glyphs:
-  - {fileID: 1860922102210260}
-  - {fileID: 1966823521396104}
-  - {fileID: 1505598755065994}
-  - {fileID: 1305829100854526}
-  - {fileID: 1050282353660368}
-  - {fileID: 1177821156162592}
-  - {fileID: 1710143612990178}
-  - {fileID: 1946089313994384}
-  - {fileID: 1951914442358624}
-  - {fileID: 1651122543700684}
-  StartButton: {fileID: 114721747335811842}
-  StartButtonObject: {fileID: 1668464805958858}
-  ProtocolText: {fileID: 102238220837740976}
 --- !u!114 &114156381183945910
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -3235,8 +3235,8 @@ MonoBehaviour:
   - {fileID: 114549380298212032}
   - {fileID: 114208471257141740}
   - {fileID: 114916071083863370}
-  - {fileID: 114230957112463836}
   - {fileID: 114740016785688784}
+  - {fileID: 114230957112463836}
   - {fileID: 114136185903541564}
   - {fileID: 114773697281363982}
   - {fileID: 114280066684598294}
