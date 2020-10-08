@@ -71,6 +71,7 @@ public class TheBioscanner : MonoBehaviour {
     bool[] Pressed = new bool[10];
     bool Started = false;
     bool Checking = false;
+    bool Struck = false;
     #pragma warning disable 0649
     bool TwitchPlaysActive;
     #pragma warning restore 0649
@@ -109,25 +110,21 @@ public class TheBioscanner : MonoBehaviour {
         break;
       }
       ProtocolText.text = Protocol;
-      for (int i = 0; i < 6; i++) {
-        for (int j = 0; j < Alphabet.Length; j++) {
+      for (int i = 0; i < 6; i++)
+        for (int j = 0; j < Alphabet.Length; j++)
           if (SN[i] == Alphabet[j]) {
             GlyphNumbers[0] += j % 5;
             goto BreakFromLoop;
           }
-        }
-      }
       BreakFromLoop:
       EdgeworkBullshit = ((Bomb.GetSerialNumberNumbers().ToArray()[0]) * (Bomb.GetBatteryCount() + Bomb.GetPortCount())) % 11;
       GlyphNumbers[0] += EdgeworkBullshit * 5;
-      for (int i = 0; i < 6; i++) {
-        for (int j = 0; j < Alphabet.Length; j++) {
+      for (int i = 0; i < 6; i++)
+        for (int j = 0; j < Alphabet.Length; j++)
           if (SN[4].ToString() == Alphabet[j].ToString()) {
             GlyphNumbers[1] += j % 5;
             goto SecondBreakFromLoop;
           }
-        }
-      }
       SecondBreakFromLoop:
       EdgeworkBullshit = ((Bomb.GetSerialNumberNumbers().ToArray().Last()) * (Bomb.GetIndicators().Count())) % 11;
       GlyphNumbers[1] += EdgeworkBullshit * 5;
@@ -190,7 +187,9 @@ public class TheBioscanner : MonoBehaviour {
           else
             TheTimerForThis = 30f;
           StartButton.transform.localPosition += FUCKINGMOVE;
-          GetComponent<KMBombModule>().HandleStrike();
+          if (!Struck)
+            GetComponent<KMBombModule>().HandleStrike();
+          Struck = false;
           for (int shitknocker = 0; shitknocker < 10; shitknocker++) {
             Pressed[shitknocker] = false;
             ButtonOutlinesButColors[shitknocker].material.color = new Color32(255, 0, 0, 255);
@@ -201,16 +200,15 @@ public class TheBioscanner : MonoBehaviour {
     }
 
     void ButtonPress (KMSelectable Button) {
-      if (Checking) {
+      if (Checking)
         return;
-      }
       if (moduleSolved) {
         for (int i = 0; i < Buttons.Length; i++) {
           if (Button == Buttons[i]) {
             Audio.PlaySoundAtTransform("FuckYouNumbers", Buttons[i].transform);
             StartCoroutine(ColorChanger(i, Pressed[i]));
             Pressed[i] = !Pressed[i];
-            }
+          }
         }
       }
       else {
@@ -243,6 +241,7 @@ public class TheBioscanner : MonoBehaviour {
       }
       else {
         GetComponent<KMBombModule>().HandleStrike();
+        Struck = true;
         for (int shitknocker = 0; shitknocker < 10; shitknocker++) {
           Pressed[shitknocker] = false;
           ButtonOutlinesButColors[shitknocker].material.color = new Color32(255, 0, 0, 255);
@@ -278,7 +277,7 @@ public class TheBioscanner : MonoBehaviour {
       bool AddOrSubtract = false;
       if (UnityEngine.Random.Range(0, 2) == 1)
         AddOrSubtract = !AddOrSubtract;
-      while (!moduleSolved) {
+      while (true) {
         if (AddOrSubtract) {
           XOffset += RandomXOffset / 100;
           YOffset += RandomYOffset / 100;
@@ -295,19 +294,16 @@ public class TheBioscanner : MonoBehaviour {
     void GenerateGlyphs () {
       GlyphOffset = UnityEngine.Random.Range(0,6);
       NumbersOfShifting.text = GlyphOffset.ToString();
-      for (int i = 0; i < 52; i++) {
-        if ((i + GlyphOffset) % 55 != GlyphNumbers[0] + GlyphOffset % 55 && (i + GlyphOffset) % 55 != GlyphNumbers[1] + GlyphOffset % 55 && (i + GlyphOffset) % 55 != GlyphNumbers[2] + GlyphOffset % 55) {
+      for (int i = 0; i < 52; i++)
+        if ((i + GlyphOffset) % 55 != GlyphNumbers[0] + GlyphOffset % 55 && (i + GlyphOffset) % 55 != GlyphNumbers[1] + GlyphOffset % 55 && (i + GlyphOffset) % 55 != GlyphNumbers[2] + GlyphOffset % 55)
           GlyphNumbersRandomized[i] = (i + GlyphOffset) % 55;
-        }
-      }
       GlyphNumbersRandomized.Shuffle();
       GlyphRandomized.Shuffle();
       Glyphs[GlyphRandomized[0]].GetComponent<SpriteRenderer>().sprite = TheGlyphsButSprites[(GlyphNumbers[0] + GlyphOffset) % 55];
       Glyphs[GlyphRandomized[1]].GetComponent<SpriteRenderer>().sprite = TheGlyphsButSprites[(GlyphNumbers[1] + GlyphOffset) % 55];
       Glyphs[GlyphRandomized[2]].GetComponent<SpriteRenderer>().sprite = TheGlyphsButSprites[(GlyphNumbers[2] + GlyphOffset) % 55];
-      for (int i = 3; i < 10; i++) {
+      for (int i = 3; i < 10; i++)
         Glyphs[GlyphRandomized[i]].GetComponent<SpriteRenderer>().sprite = TheGlyphsButSprites[GlyphNumbersRandomized[i]];
-      }
       Debug.LogFormat("[The Bioscanner #{0}] The current offset is {1}. This means the current coordinates are {2}{3}, {4}{5}, and {6}{7}.", moduleId, GlyphOffset, Alphabet[(((GlyphNumbers[0] + GlyphOffset) % 55)) % 5], ((((GlyphNumbers[0] + GlyphOffset) % 55)) / 5) + 1, Alphabet[((GlyphNumbers[1] + GlyphOffset) % 55) % 5], (((GlyphNumbers[1] + GlyphOffset) % 55) / 5) + 1, Alphabet[((GlyphNumbers[2] + GlyphOffset) % 55) % 5], (((GlyphNumbers[2] + GlyphOffset) % 55) / 5) + 1);
       Debug.LogFormat("[The Bioscanner #{0}] Fake glyphs are:", moduleId);
       for (int i = 3; i < 10; i++)
@@ -356,39 +352,28 @@ public class TheBioscanner : MonoBehaviour {
     IEnumerator ProcessTwitchCommand (string Command) {
       Command = Command.Trim().ToUpper();
       yield return null;
-      if (Command == "START") {
+      if (Command == "START")
         StartButton.OnInteract();
-      }
-      else if (Command == "A1") {
+      else if (Command == "A1")
         Buttons[4].OnInteract();
-      }
-      else if (Command == "A2") {
+      else if (Command == "A2")
         Buttons[5].OnInteract();
-      }
-      else if (Command == "A3") {
+      else if (Command == "A3")
         Buttons[6].OnInteract();
-      }
-      else if (Command == "B1") {
+      else if (Command == "B1")
         Buttons[0].OnInteract();
-      }
-      else if (Command == "B2") {
+      else if (Command == "B2")
         Buttons[1].OnInteract();
-      }
-      else if (Command == "B3") {
+      else if (Command == "B3")
         Buttons[2].OnInteract();
-      }
-      else if (Command == "B4") {
+      else if (Command == "B4")
         Buttons[3].OnInteract();
-      }
-      else if (Command == "C1") {
+      else if (Command == "C1")
         Buttons[7].OnInteract();
-      }
-      else if (Command == "C2") {
+      else if (Command == "C2")
         Buttons[8].OnInteract();
-      }
-      else if (Command == "C3") {
+      else if (Command == "C3")
         Buttons[9].OnInteract();
-      }
       else {
         yield return null;
         yield return "sendtochaterror I don't understand!";
@@ -397,16 +382,14 @@ public class TheBioscanner : MonoBehaviour {
     }
 
     IEnumerator TwitchHandleForcedSolve () {
-      if (!Started) {
+      if (!Started)
         StartButton.OnInteract();
-      }
       TheTimerForThis = 30f;
-      for (int i = 0; i < 10; i++) {
+      for (int i = 0; i < 10; i++)
         if (Pressed[i]) {
           Buttons[i].OnInteract();
           yield return new WaitForSecondsRealtime(.1f);
         }
-      }
       Buttons[GlyphRandomized[0]].OnInteract();
       yield return new WaitForSecondsRealtime(.1f);
       Buttons[GlyphRandomized[1]].OnInteract();
