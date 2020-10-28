@@ -35,13 +35,13 @@ public class TheBioscanner : MonoBehaviour {
     int[] GlyphNumbers = new int[3];
     int[] GlyphRandomized = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9};
     int[] GlyphNumbersRandomized = new int[52];
-    int EdgeworkBullshit = 0;
-    int GlyphOffset = 0;
+    int EdgeworkBullshit;
+    int GlyphOffset;
 
     float RandomXOffset;
     float RandomYOffset;
-    float XOffset = 0f;
-    float YOffset = 0f;
+    float XOffset;
+    float YOffset;
     float TheTimerForThis = 30f;
 
     string[][] NatoIGuess = new string[17][] {
@@ -65,13 +65,13 @@ public class TheBioscanner : MonoBehaviour {
     };
     string[] NumbersForProtocol = {"Zero" ,"One", "Two", "Three", "Four", "Five", "Six", "Seven", "Eight", "Nine"};
     string Protocol = "Initiating security Protocol:\n";
-    string SN = "";
+    string SN;
     string Alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
 
     bool[] Pressed = new bool[10];
-    bool Started = false;
-    bool Checking = false;
-    bool Struck = false;
+    bool Started;
+    bool Checking;
+    bool Struck;
     #pragma warning disable 0649
     bool TwitchPlaysActive;
     #pragma warning restore 0649
@@ -200,7 +200,7 @@ public class TheBioscanner : MonoBehaviour {
     }
 
     void ButtonPress (KMSelectable Button) {
-      if (Checking)
+      if (Checking || !Started)
         return;
       if (moduleSolved) {
         for (int i = 0; i < Buttons.Length; i++) {
@@ -352,7 +352,7 @@ public class TheBioscanner : MonoBehaviour {
     IEnumerator ProcessTwitchCommand (string Command) {
       Command = Command.Trim().ToUpper();
       yield return null;
-      if (Command == "START")
+      if (Command == "START" || Command == "ACTIVATE")
         StartButton.OnInteract();
       else if (Command == "A1")
         Buttons[4].OnInteract();
