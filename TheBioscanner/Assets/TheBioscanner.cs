@@ -78,16 +78,40 @@ public class TheBioscanner : MonoBehaviour {
 
     Vector3 FUCKINGMOVE = new Vector3(0f, 1f, 0f);
 
+    TheBioscannerSettings Settings = new TheBioscannerSettings();
+#pragma warning disable 414
+    private static Dictionary<string, object>[] TweaksEditorSettings = new Dictionary<string, object>[]
+    {
+      new Dictionary<string, object>
+      {
+        { "Filename", "TheBioscannerSettings.json"},
+        { "Name", "The Bioscanner" },
+        { "Listings", new List<Dictionary<string, object>>
+        {
+          new Dictionary<string, object>
+          {
+            { "Key", "Timer" },
+            { "Text", "Edit how long the timer runs (in seconds)."}
+          }
+        }}
+      }
+    };
+#pragma warning restore 414
     void Awake () {
         moduleId = moduleIdCounter++;
         foreach (KMSelectable Button in Buttons) {
-            KMSelectable Button2 = Button; //The person who made unity is a fucking retard
+            KMSelectable Button2 = Button; // The person who made c# is a fucking retard
             Button.OnInteract += delegate () { ButtonPress(Button2); return false; };
         }
         StartButton.OnInteract += delegate () {StartPress(); return false;};
+        ModConfig<TheBioscannerSettings> modConfig = new ModConfig<TheBioscannerSettings>("TheBioscannerSettings");
+        Settings = modConfig.Read();
+        // If there are any isues, write the default settings
+        modConfig.Write(Settings);
     }
 
     void Start () {
+      TheTimerForThis = Settings.Timer;
       MovingAll.gameObject.SetActive(false);
       StartButtonObject.gameObject.SetActive(true);
       RandomXOffset = UnityEngine.Random.Range(0f, 2f);
@@ -166,9 +190,9 @@ public class TheBioscanner : MonoBehaviour {
 
     void StartPress () {
       if (TwitchPlaysActive)
-        TheTimerForThis = 45f;
+        TheTimerForThis = Settings.Timer + 15f;
       else
-        TheTimerForThis = 30f;
+        TheTimerForThis = Settings.Timer;
       Started = true;
       StartButtonObject.gameObject.SetActive(false);
       StartButton.transform.localPosition -= FUCKINGMOVE;
@@ -183,9 +207,9 @@ public class TheBioscanner : MonoBehaviour {
           StartButtonObject.gameObject.SetActive(true);
           MovingAll.gameObject.SetActive(false);
           if (TwitchPlaysActive)
-            TheTimerForThis = 45f;
+            TheTimerForThis = Settings.Timer + 15f;
           else
-            TheTimerForThis = 30f;
+            TheTimerForThis = Settings.Timer;
           StartButton.transform.localPosition += FUCKINGMOVE;
           if (!Struck)
             GetComponent<KMBombModule>().HandleStrike();
@@ -396,5 +420,10 @@ public class TheBioscanner : MonoBehaviour {
       yield return new WaitForSecondsRealtime(.1f);
       Buttons[GlyphRandomized[2]].OnInteract();
       yield return new WaitForSecondsRealtime(.1f);
+    }
+
+    class TheBioscannerSettings
+    {
+      public float Timer = 30f;
     }
 }
