@@ -42,12 +42,12 @@ public class TheBioscanner : MonoBehaviour {
     float RandomYOffset;
     float XOffset;
     float YOffset;
-    float TheTimerForThis = 30f;
+    float TheTimerForThis = 70f;
 
     string[][] NatoIGuess = new string[17][] {
-      new string[1] {"Alpha "},
+      new string[2] {"Alpha ", "Alfa "},
       new string[2] {"Bravo ", "Beta "},
-      new string[1] {"Charlie "},
+      new string[3] {"Charlie ", "Chuck ", "Child "},
       new string[1] {"Delta "},
       new string[2] {"Echo ", "Epsilon "},
       new string[1] {"Hotel "},
@@ -78,8 +78,10 @@ public class TheBioscanner : MonoBehaviour {
 
     Vector3 FUCKINGMOVE = new Vector3(0f, 1f, 0f);
 
+    #region ModSettings
+
     TheBioscannerSettings Settings = new TheBioscannerSettings();
-#pragma warning disable 414
+    #pragma warning disable 414
     private static Dictionary<string, object>[] TweaksEditorSettings = new Dictionary<string, object>[]
     {
       new Dictionary<string, object>
@@ -96,7 +98,15 @@ public class TheBioscanner : MonoBehaviour {
         }}
       }
     };
-#pragma warning restore 414
+    #pragma warning restore 414
+
+    class TheBioscannerSettings
+    {
+      public float Timer = 70f;
+    }
+
+    #endregion
+
     void Awake () {
         moduleId = moduleIdCounter++;
         foreach (KMSelectable Button in Buttons) {
@@ -109,6 +119,8 @@ public class TheBioscanner : MonoBehaviour {
         // If there are any isues, write the default settings
         modConfig.Write(Settings);
     }
+
+    #region Glyph Generation
 
     void Start () {
       TheTimerForThis = Settings.Timer;
@@ -188,133 +200,6 @@ public class TheBioscanner : MonoBehaviour {
       Debug.LogFormat("[The Bioscanner #{0}] The third coordinate is {1}{2}.", moduleId, Alphabet[GlyphNumbers[2] % 5], (GlyphNumbers[2] / 5) + 1);
     }
 
-    void StartPress () {
-      if (TwitchPlaysActive)
-        TheTimerForThis = Settings.Timer + 15f;
-      else
-        TheTimerForThis = Settings.Timer;
-      Started = true;
-      StartButtonObject.gameObject.SetActive(false);
-      StartButton.transform.localPosition -= FUCKINGMOVE;
-      MovingAll.gameObject.SetActive(true);
-      GenerateGlyphs();
-    }
-
-    void Update () {
-      if (Started) {
-        TheTimerForThis -= Time.deltaTime;
-        if (TheTimerForThis < 0) {
-          StartButtonObject.gameObject.SetActive(true);
-          MovingAll.gameObject.SetActive(false);
-          if (TwitchPlaysActive)
-            TheTimerForThis = Settings.Timer + 15f;
-          else
-            TheTimerForThis = Settings.Timer;
-          StartButton.transform.localPosition += FUCKINGMOVE;
-          if (!Struck)
-            GetComponent<KMBombModule>().HandleStrike();
-          Struck = false;
-          for (int shitknocker = 0; shitknocker < 10; shitknocker++) {
-            Pressed[shitknocker] = false;
-            ButtonOutlinesButColors[shitknocker].material.color = new Color32(255, 0, 0, 255);
-          }
-          Started = false;
-        }
-      }
-    }
-
-    void ButtonPress (KMSelectable Button) {
-      if (Checking || !Started)
-        return;
-      if (moduleSolved) {
-        for (int i = 0; i < Buttons.Length; i++) {
-          if (Button == Buttons[i]) {
-            Audio.PlaySoundAtTransform("FuckYouNumbers", Buttons[i].transform);
-            StartCoroutine(ColorChanger(i, Pressed[i]));
-            Pressed[i] = !Pressed[i];
-          }
-        }
-      }
-      else {
-        for (int i = 0; i < Buttons.Length; i++) {
-          if (Button == Buttons[i]) {
-            Audio.PlaySoundAtTransform("FuckYouNumbers", Buttons[i].transform);
-            StartCoroutine(ColorChanger(i, Pressed[i]));
-            Pressed[i] = !Pressed[i];
-            int NumberOfPressed = 0;
-            for (int j = 0; j < 10; j++) {
-              if (Pressed[j]) {
-                NumberOfPressed++;
-              }
-            }
-            if (NumberOfPressed == 3)
-              StartCoroutine(Waiting());
-            }
-          }
-      }
-      }
-
-    IEnumerator Waiting () {
-      Checking = true;
-      TheTimerForThis += 3f;
-      yield return new WaitForSecondsRealtime(3f);
-      if (Pressed[GlyphRandomized[0]] && Pressed[GlyphRandomized[1]] && Pressed[GlyphRandomized[2]]) {
-        GetComponent<KMBombModule>().HandlePass();
-        Started = false;
-        moduleSolved = true;
-      }
-      else {
-        GetComponent<KMBombModule>().HandleStrike();
-        Struck = true;
-        for (int shitknocker = 0; shitknocker < 10; shitknocker++) {
-          Pressed[shitknocker] = false;
-          ButtonOutlinesButColors[shitknocker].material.color = new Color32(255, 0, 0, 255);
-        }
-    }
-    Checking = false;
-  }
-
-    IEnumerator ColorChanger (int Weed, bool PressedOfI) {
-      if (!PressedOfI) {
-        byte Red = 255;
-        byte Green = 0;
-        for (int j = 0; j < 51; j++) {
-          Red -= 5;
-          Green += 5;
-          ButtonOutlinesButColors[Weed].material.color = new Color32(Red, Green, 0, 255);
-          yield return new WaitForSecondsRealtime(.005f);
-        }
-      }
-      else {
-        byte Red = 0;
-        byte Green = 255;
-        for (int j = 0; j < 51; j++) {
-          Red += 5;
-          Green -= 5;
-          ButtonOutlinesButColors[Weed].material.color = new Color32(Red, Green, 0, 255);
-          yield return new WaitForSecondsRealtime(.005f);
-        }
-      }
-    }
-
-    IEnumerator MovingSpace () {
-      bool AddOrSubtract = false;
-      if (UnityEngine.Random.Range(0, 2) == 1)
-        AddOrSubtract = !AddOrSubtract;
-      while (true) {
-        if (AddOrSubtract) {
-          XOffset += RandomXOffset / 100;
-          YOffset += RandomYOffset / 100;
-        }
-        else {
-          XOffset -= RandomXOffset / 100;
-          YOffset -= RandomYOffset / 100;
-        }
-        Space.material.SetTextureOffset("_MainTex", new Vector2(XOffset, YOffset));
-        yield return new WaitForSeconds(.01f);
-      }
-    }
-
     void GenerateGlyphs () {
       GlyphOffset = UnityEngine.Random.Range(0,6);
       NumbersOfShifting.text = GlyphOffset.ToString();
@@ -369,6 +254,143 @@ public class TheBioscanner : MonoBehaviour {
       }
     }
 
+    #endregion
+
+    #region Button Presses
+
+    void StartPress () {
+      Started = true;
+      StartButtonObject.gameObject.SetActive(false);
+      StartButton.transform.localPosition -= FUCKINGMOVE;
+      MovingAll.gameObject.SetActive(true);
+      GenerateGlyphs();
+    }
+
+    void ButtonPress (KMSelectable Button) {
+      if (Checking || !Started)
+        return;
+      if (moduleSolved) {
+        for (int i = 0; i < Buttons.Length; i++) {
+          if (Button == Buttons[i]) {
+            Audio.PlaySoundAtTransform("FuckYouNumbers", Buttons[i].transform);
+            StartCoroutine(ColorChanger(i, Pressed[i]));
+            Pressed[i] = !Pressed[i];
+          }
+        }
+      }
+      else {
+        for (int i = 0; i < Buttons.Length; i++) {
+          if (Button == Buttons[i]) {
+            Audio.PlaySoundAtTransform("FuckYouNumbers", Buttons[i].transform);
+            StartCoroutine(ColorChanger(i, Pressed[i]));
+            Pressed[i] = !Pressed[i];
+            int NumberOfPressed = 0;
+            for (int j = 0; j < 10; j++) {
+              if (Pressed[j]) {
+                NumberOfPressed++;
+              }
+            }
+            if (NumberOfPressed == 3)
+              StartCoroutine(Waiting());
+            }
+          }
+      }
+    }
+
+    #endregion
+
+    #region Pretty Things
+
+    IEnumerator ColorChanger (int Weed, bool PressedOfI) {
+      if (!PressedOfI) {
+        byte Red = 255;
+        byte Green = 0;
+        for (int j = 0; j < 51; j++) {
+          Red -= 5;
+          Green += 5;
+          ButtonOutlinesButColors[Weed].material.color = new Color32(Red, Green, 0, 255);
+          yield return new WaitForSecondsRealtime(.005f);
+        }
+      }
+      else {
+        byte Red = 0;
+        byte Green = 255;
+        for (int j = 0; j < 51; j++) {
+          Red += 5;
+          Green -= 5;
+          ButtonOutlinesButColors[Weed].material.color = new Color32(Red, Green, 0, 255);
+          yield return new WaitForSecondsRealtime(.005f);
+        }
+      }
+    }
+
+    IEnumerator MovingSpace () {
+      bool AddOrSubtract = false;
+      if (UnityEngine.Random.Range(0, 2) == 1)
+        AddOrSubtract = !AddOrSubtract;
+      while (true) {
+        if (AddOrSubtract) {
+          XOffset += RandomXOffset / 100;
+          YOffset += RandomYOffset / 100;
+        }
+        else {
+          XOffset -= RandomXOffset / 100;
+          YOffset -= RandomYOffset / 100;
+        }
+        Space.material.SetTextureOffset("_MainTex", new Vector2(XOffset, YOffset));
+        yield return new WaitForSeconds(.01f);
+      }
+    }
+
+    #endregion
+
+    #region Misc
+
+    void Update () {
+      if (Started) {
+        TheTimerForThis -= Time.deltaTime;
+        if (TheTimerForThis < 0) {
+          StartButtonObject.gameObject.SetActive(true);
+          MovingAll.gameObject.SetActive(false);
+          if (TwitchPlaysActive)
+            TheTimerForThis = Settings.Timer + 15f;
+          else
+            TheTimerForThis = Settings.Timer;
+          StartButton.transform.localPosition += FUCKINGMOVE;
+          if (!Struck)
+            GetComponent<KMBombModule>().HandleStrike();
+          Struck = false;
+          for (int shitknocker = 0; shitknocker < 10; shitknocker++) {
+            Pressed[shitknocker] = false;
+            ButtonOutlinesButColors[shitknocker].material.color = new Color32(255, 0, 0, 255);
+          }
+          Started = false;
+        }
+      }
+    }
+
+    IEnumerator Waiting () {
+      Checking = true;
+      TheTimerForThis += 3f;
+      yield return new WaitForSecondsRealtime(3f);
+      if (Pressed[GlyphRandomized[0]] && Pressed[GlyphRandomized[1]] && Pressed[GlyphRandomized[2]]) {
+        GetComponent<KMBombModule>().HandlePass();
+        Started = false;
+        moduleSolved = true;
+      }
+      else {
+        GetComponent<KMBombModule>().HandleStrike();
+        Struck = true;
+        for (int shitknocker = 0; shitknocker < 10; shitknocker++) {
+          Pressed[shitknocker] = false;
+          ButtonOutlinesButColors[shitknocker].material.color = new Color32(255, 0, 0, 255);
+        }
+    }
+    Checking = false;
+  }
+
+  #endregion
+
     #pragma warning disable 414
     private readonly string TwitchHelpMessage = @"Use !{0} X# to select a coordinate on the module. Use !{0} start to start the module.";
     #pragma warning restore 414
@@ -408,7 +430,7 @@ public class TheBioscanner : MonoBehaviour {
     IEnumerator TwitchHandleForcedSolve () {
       if (!Started)
         StartButton.OnInteract();
-      TheTimerForThis = 30f;
+      TheTimerForThis = 70f;
       for (int i = 0; i < 10; i++)
         if (Pressed[i]) {
           Buttons[i].OnInteract();
@@ -420,10 +442,5 @@ public class TheBioscanner : MonoBehaviour {
       yield return new WaitForSecondsRealtime(.1f);
       Buttons[GlyphRandomized[2]].OnInteract();
       yield return new WaitForSecondsRealtime(.1f);
-    }
-
-    class TheBioscannerSettings
-    {
-      public float Timer = 30f;
     }
 }
