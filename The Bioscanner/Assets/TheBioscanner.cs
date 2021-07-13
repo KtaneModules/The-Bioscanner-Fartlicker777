@@ -213,10 +213,14 @@ public class TheBioscanner : MonoBehaviour {
          Glyphs[GlyphRandomized[i]].GetComponent<SpriteRenderer>().sprite = TheGlyphsButSprites[GlyphNumbersRandomized[i]];
       }
       Debug.LogFormat("[The Bioscanner #{0}] The current offset is {1}. This means the current glyphs are {2}{3}, {4}{5}, and {6}{7}.", moduleId, GlyphOffset, Alphabet[(((GlyphNumbers[0] + GlyphOffset) % 55)) % 5], ((((GlyphNumbers[0] + GlyphOffset) % 55)) / 5) + 1, Alphabet[((GlyphNumbers[1] + GlyphOffset) % 55) % 5], (((GlyphNumbers[1] + GlyphOffset) % 55) / 5) + 1, Alphabet[((GlyphNumbers[2] + GlyphOffset) % 55) % 5], (((GlyphNumbers[2] + GlyphOffset) % 55) / 5) + 1);
-      Debug.LogFormat("[The Bioscanner #{0}] Fake glyphs are:", moduleId);
+      string Log = "";
       for (int i = 3; i < 10; i++) {
-         Debug.LogFormat("[The Bioscanner #{0}] {1}{2}.", moduleId, Alphabet[GlyphNumbersRandomized[i] % 5], (GlyphNumbersRandomized[i] / 5) + 1);
+         Log += Alphabet[GlyphNumbersRandomized[i] % 5] + ((GlyphNumbersRandomized[i] / 5) + 1).ToString();
+         if (i != 10) {
+            Log += " ";
+         }
       }
+      Debug.LogFormat("[The Bioscanner #{0}] Fake glyphs are: {1}", moduleId, Log);
       Debug.LogFormat("[The Bioscanner #{0}] Press buttons:", moduleId);
       for (int i = 0; i < 3; i++) {
          switch (GlyphRandomized[i]) {
