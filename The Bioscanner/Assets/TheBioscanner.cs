@@ -433,6 +433,7 @@ public class TheBioscanner : MonoBehaviour {
       yield return new WaitForSecondsRealtime(.1f);
       Buttons[GlyphRandomized[2]].OnInteract();
       yield return new WaitForSecondsRealtime(.1f);
+      while (!moduleSolved) yield return true;
    }
 
    #endregion
